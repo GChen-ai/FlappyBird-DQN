@@ -32,9 +32,9 @@ mode='test'
 env=game.GameState(mode)
 action_dim=2
 print_reward=0
-learning_starts=30000
-schedule_timesteps=40000
-agent=DQN(action_dim)
+learning_starts=0
+schedule_timesteps=1
+agent=DQN(action_dim,schedule_timesteps=schedule_timesteps,learning_starts=learning_starts)
 agent.load(save_path)
 for step in range(1,max_training_timesteps):
     env.init(mode)
@@ -58,7 +58,9 @@ for step in range(1,max_training_timesteps):
             #next_state=agent.embedding(next_state)
         next_state=np.append(next_state,state[:,:,:9],axis=2)
         agent.store_transition(state,action,reward,next_state,done)
+        state=next_state
         step_reward+=reward
+        f+=1
         if done:
             break
     print_reward+=step_reward

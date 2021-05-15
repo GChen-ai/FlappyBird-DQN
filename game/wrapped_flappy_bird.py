@@ -12,7 +12,7 @@ import pygame.surfarray as surfarray
 from pygame.locals import *
 from itertools import cycle
 from PIL import Image
-FPS = 240
+FPS = 60
 SCREENWIDTH  = 288
 SCREENHEIGHT = 512
 
