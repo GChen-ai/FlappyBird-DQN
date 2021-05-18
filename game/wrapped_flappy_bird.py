@@ -12,7 +12,7 @@ import pygame.surfarray as surfarray
 from pygame.locals import *
 from itertools import cycle
 from PIL import Image
-FPS = 60
+FPS = 240
 SCREENWIDTH  = 288
 SCREENHEIGHT = 512
 
@@ -131,7 +131,7 @@ class GameState:
             #SOUNDS['die'].play()
             terminal = True
             self.__init__(self.mode)
-            reward = -1
+            reward = -2*alpha
 
         # draw sprites
         SCREEN.blit(IMAGES['background'], (0,0))

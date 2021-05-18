@@ -18,26 +18,27 @@ torch.cuda.manual_seed_all(seed)
 np.random.seed(seed)
 random.seed(seed)
 save_path='models/'
-max_training_timesteps = int(2e10)
+max_training_timesteps = int(1e8)
+max_train_steps=5e5
 print_steps=1000
 
 max_steps = 30000
 save_steps=1000
 gamma = 0.99
-capacity=70000
+capacity=200000
 lr = 0.00001
-learning_starts=30000
-schedule_timesteps=40000
+learning_starts=100000
+schedule_timesteps=50000
 device = torch.device('cpu')
 
 if(torch.cuda.is_available()): 
     device = torch.device('cuda:0')
-batch_size=64
+batch_size=256
 mode='test'
 env=game.GameState(mode)
 action_dim=2
 
-agent=DQN(action_dim,gamma,lr,capacity,schedule_timesteps=schedule_timesteps,learning_starts=learning_starts)
+agent=DQN(action_dim,gamma,lr,capacity,schedule_timesteps=schedule_timesteps,learning_starts=learning_starts,train_steps=max_train_steps)
 #agent.load(save_path)
 step_reward=0
 steps=0

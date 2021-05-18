@@ -75,7 +75,7 @@ class Net(nn.Module):
 
     
 class DQN:
-    def __init__(self,action_dim,gamma=0.99,lr=0.003,capacity=50000,initial_p=1.0,final_p=0.1,schedule_timesteps=40000,learning_starts=30000):
+    def __init__(self,action_dim,gamma=0.99,lr=0.003,capacity=50000,initial_p=1.0,final_p=0.1,schedule_timesteps=40000,learning_starts=30000,train_steps=2e8):
         self.gamma=gamma
         self.action_dim=action_dim
         self.QNet=Net(action_dim).to(device)
@@ -85,6 +85,8 @@ class DQN:
         self.buffer=Buffer(self.capacity)
         self.mse=nn.MSELoss()
         self.optimizer = torch.optim.Adam(self.QNet.parameters(), lr)
+        lam = lambda e: 1 - e / train_steps
+        self.opti_scheduler = torch.optim.lr_scheduler.LambdaLR(self.optimizer, lr_lambda=lam)
         self.memory_count=0
         self.update_count=0
         self.print_count=0
@@ -124,7 +126,6 @@ class DQN:
             
             bird_dataset=BirdDatasetDQN(self.buffer,self.memory_count,self.capacity)
             bird_dataloader = DataLoader(bird_dataset, batch_size=batchsize, shuffle=True, num_workers=4,drop_last=True)
-
             for i, batch_samples in enumerate(bird_dataloader):
                 train_states, train_actions, train_next_states, train_rewards, is_terminate= batch_samples["state"], batch_samples["action"], batch_samples["next_state"],batch_samples["reward"],batch_samples['is_terminate']
                 
@@ -157,14 +158,13 @@ class DQN:
                 self.optimizer.zero_grad()
                 loss.backward()
                 self.optimizer.step()
-                #
                 #print('update')
                 self.update_count+=1
                 self.print_count+=1
-            #self.opti_scheduler.step()
+                self.opti_scheduler.step()
                 if self.print_count%100==0:
                     print("DQN loss: %.5f"%(loss.item()))
-                if self.update_count%1000==0:
+                if self.update_count%2000==0:
                     self.targetQNet.load_state_dict(self.QNet.state_dict())
                 break
 
